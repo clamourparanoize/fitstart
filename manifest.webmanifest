@@ -1,0 +1,22 @@
+{
+  "name": "FitStart – Dein Training",
+  "short_name": "FitStart",
+  "description": "Trainingsbegleiter für zu Hause: Kraft, Kondition und Beweglichkeit mit Pausentimer, Sprachansage und Fortschritt.",
+  "lang": "de",
+  "start_url": "./index.html#/heute",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0d0d",
+  "theme_color": "#eb6834",
+  "categories": ["health", "fitness", "sports"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nächstes Training", "short_name": "Training", "url": "./index.html#/heute" },
+    { "name": "Fortschritt", "short_name": "Fortschritt", "url": "./index.html#/fortschritt" }
+  ]
+}

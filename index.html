@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>FitStart</title>
+  <meta name="description" content="Dein Trainingsbegleiter für zu Hause: Kraft, Kondition und Beweglichkeit.">
+  <meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FitStart">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="app" aria-live="polite"></div>
+
+  <nav id="tabbar" class="tabbar" aria-label="Hauptnavigation">
+    <a href="#/heute" data-tab="heute"><span data-icon="home"></span><span>Heute</span></a>
+    <a href="#/plaene" data-tab="plaene"><span data-icon="list"></span><span>Pläne</span></a>
+    <a href="#/uebungen" data-tab="uebungen"><span data-icon="dumbbell"></span><span>Übungen</span></a>
+    <a href="#/fortschritt" data-tab="fortschritt"><span data-icon="chart"></span><span>Fortschritt</span></a>
+    <a href="#/erfolge" data-tab="erfolge"><span data-icon="trophy"></span><span>Erfolge</span></a>
+  </nav>
+
+  <div id="overlay-root"></div>
+  <div id="toast-root" aria-live="assertive"></div>
+
+  <noscript>Bitte JavaScript aktivieren, um FitStart zu nutzen.</noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
