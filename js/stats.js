@@ -40,9 +40,11 @@ export function entryReps(entry) {
   return { reps, kg };
 }
 
+// Trainings in der Woche, in der „now“ liegt.
 export function thisWeekCount(history, now = Date.now()) {
   const ws = weekStart(now);
-  return history.filter((h) => h.start >= ws).length;
+  const we = addDays(ws, 7);
+  return history.filter((h) => h.start >= ws && h.start < we).length;
 }
 
 // Kennzahlen pro Woche für die letzten n Wochen (älteste zuerst).
@@ -51,7 +53,7 @@ export function weeklySeries(history, weeks = 12, now = Date.now()) {
   const out = [];
   for (let i = weeks - 1; i >= 0; i--) {
     const start = addDays(current, -7 * i);
-    out.push({ start, count: 0, minutes: 0, reps: 0, kg: 0 });
+    out.push({ start, count: 0, minutes: 0, reps: 0, kg: 0, km: 0, kcal: 0, cardioMin: 0 });
   }
   const first = out[0].start;
   for (const h of history) {
@@ -64,6 +66,9 @@ export function weeklySeries(history, weeks = 12, now = Date.now()) {
     row.minutes += h.durationSec / 60;
     row.reps += reps;
     row.kg += kg;
+    row.km += h.km || 0;
+    row.kcal += h.kcal || 0;
+    if (h.kind === 'ausdauer') row.cardioMin += h.durationSec / 60;
   }
   return out;
 }
@@ -97,14 +102,17 @@ export function streakInfo(history, goal) {
 }
 
 export function totals(history) {
-  let minutes = 0, reps = 0, kg = 0;
+  let minutes = 0, reps = 0, kg = 0, km = 0, kcal = 0, cardio = 0;
   for (const h of history) {
     minutes += h.durationSec / 60;
     const r = entryReps(h);
     reps += r.reps;
     kg += r.kg;
+    km += h.km || 0;
+    kcal += h.kcal || 0;
+    if (h.kind === 'ausdauer') cardio += 1;
   }
-  return { workouts: history.length, minutes, reps, kg };
+  return { workouts: history.length, minutes, reps, kg, km, kcal, cardio };
 }
 
 // Bestwert einer Übung in einem Training (nur Krafttrainings, dort wird selbst gezählt).

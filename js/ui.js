@@ -1,4 +1,5 @@
 // Kleine DOM-Helfer, Icons, Dialoge und Formatierungen.
+import { pushSheet, closeSheet } from './nav.js';
 
 export function h(tag, props, ...children) {
   const el = document.createElement(tag);
@@ -95,20 +96,28 @@ export function hydrateIcons(root = document) {
 // ---------- Overlays ----------
 const overlayRoot = () => document.getElementById('overlay-root');
 
+// Öffnet ein Fenster von unten. close() gibt ein Promise zurück, das erfüllt ist,
+// sobald das Fenster zu ist (danach erst weiter navigieren).
 export function openSheet(content, { center = false, onClose } = {}) {
-  const sheet = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true' }, center ? null : h('div', { class: 'grab' }), content);
+  const id = `s${Math.random().toString(36).slice(2, 9)}`;
+  const sheet = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true' },
+    center ? null : h('div', { class: 'sheet-head' },
+      h('div', { class: 'grab' }),
+      h('button', { class: 'icon-btn plain sheet-close', 'aria-label': 'Schließen', onclick: () => close() }, icon('close')),
+    ),
+    content);
   const backdrop = h('div', { class: `backdrop${center ? ' center' : ''}` }, sheet);
   let closed = false;
-  const close = () => {
+  const closeInternal = () => {
     if (closed) return;
     closed = true;
     backdrop.remove();
-    window.removeEventListener('hashchange', close);
     onClose?.();
   };
+  const close = () => (closed ? Promise.resolve() : closeSheet(id, closeInternal));
   backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(); });
-  window.addEventListener('hashchange', close);
   overlayRoot().append(backdrop);
+  pushSheet(id, closeInternal);
   return { close, sheet };
 }
 
@@ -120,11 +129,11 @@ export function confirmDialog({ title, text, ok = 'OK', cancel = 'Abbrechen', da
         h('h2', null, title),
         text ? h('p', { class: 'muted' }, text) : null,
         h('div', { class: 'row', style: { justifyContent: 'flex-end', marginTop: '20px' } },
-          h('button', { class: 'btn', onclick: () => close() }, cancel),
-          h('button', { class: `btn ${danger ? 'danger' : 'primary'}`, onclick: () => { result = true; close(); } }, ok),
+          h('button', { class: 'btn', onclick: () => close().then(() => resolve(false)) }, cancel),
+          h('button', { class: `btn ${danger ? 'danger' : 'primary'}`, onclick: () => { result = true; close().then(() => resolve(true)); } }, ok),
         ),
       ),
-      { center: true, onClose: () => resolve(result) },
+      { center: true, onClose: () => setTimeout(() => resolve(result), 0) },
     );
   });
 }

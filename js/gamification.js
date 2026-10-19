@@ -66,6 +66,12 @@ export const BADGES = [
   { id: 'stahlrumpf', emoji: '🧱', name: 'Stahlrumpf', desc: '60 Sek. Unterarmstütz am Stück (Krafttraining)', test: (c) => plank60(c.history) },
   { id: 'mutig', emoji: '🎲', name: 'Mutig', desc: 'Ein „Überrasch mich“-Training geschafft', test: (c) => c.history.some((h) => h.surprise) },
   { id: 'challenge10', emoji: '✅', name: 'Challenge-Jäger', desc: '10 Tages-Challenges erledigt', test: (c) => Object.keys(c.state.challenges).length >= 10 },
+  { id: 'ausdauer1', emoji: '🚴', name: 'Ausdauer-Start', desc: 'Erste Ausdauer-Einheit (Gerät oder draußen)', test: (c) => c.totals.cardio >= 1 },
+  { id: 'ausdauer10', emoji: '❤️', name: 'Herz-Kreislauf-Held', desc: '10 Ausdauer-Einheiten', test: (c) => c.totals.cardio >= 10 },
+  { id: 'km10', emoji: '🛣️', name: '10 Kilometer', desc: '10 km insgesamt eingetragen', test: (c) => c.totals.km >= 10 },
+  { id: 'km50', emoji: '🌍', name: '50 Kilometer', desc: '50 km insgesamt eingetragen', test: (c) => c.totals.km >= 50 },
+  { id: 'stufe', emoji: '📶', name: 'Stufe hoch', desc: 'In einem Ausdauer-Programm eine Stufe aufgestiegen', test: (c) => (c.state.stageUps || 0) >= 1 },
+  { id: 'gesichert', emoji: '💾', name: 'Gut gesichert', desc: 'Die erste Datensicherung gemacht', test: (c) => !!c.state.lastBackup },
   { id: 'level5', emoji: '⭐', name: 'Level 5', desc: 'Level 5 erreicht', test: (c) => c.level >= 5 },
   { id: 'level10', emoji: '🌟', name: 'Level 10', desc: 'Level 10 erreicht', test: (c) => c.level >= 10 },
 ];

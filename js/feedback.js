@@ -63,9 +63,20 @@ function pickVoice() {
 }
 if ('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { germanVoice = null; pickVoice(); });
 
-export function say(text, { force = false } = {}) {
-  if (!('speechSynthesis' in window)) return;
-  if (!force && !getState().settings.voice) return;
+// Liest text vor. onEnd wird nach dem Vorlesen aufgerufen – oder, wenn die
+// Sprachausgabe aus ist, nach der geschätzten Lesezeit.
+export function say(text, { force = false, onEnd } = {}) {
+  let ended = false;
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    onEnd?.();
+  };
+  const readMs = Math.max(2500, text.length * 70);
+  if (!('speechSynthesis' in window) || (!force && !getState().settings.voice)) {
+    if (onEnd) setTimeout(finish, readMs);
+    return;
+  }
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -73,8 +84,16 @@ export function say(text, { force = false } = {}) {
     const v = pickVoice();
     if (v) u.voice = v;
     u.rate = 1.02;
+    if (onEnd) {
+      u.onend = finish;
+      u.onerror = finish;
+      // Sicherheitsnetz, falls das Ende nicht gemeldet wird
+      setTimeout(finish, readMs + 4000);
+    }
     speechSynthesis.speak(u);
-  } catch { /* Sprachausgabe nicht verfügbar */ }
+  } catch {
+    if (onEnd) setTimeout(finish, readMs);
+  }
 }
 
 export function stopSpeech() {

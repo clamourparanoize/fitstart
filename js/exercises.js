@@ -9,6 +9,7 @@
 //   jump     enthält Sprünge (laut)
 //   wrist    'ok' = handgelenkschonend, 'fist' = auf Fäusten, 'flat' = flache Hand nötig
 //   easier / harder  leichtere bzw. schwerere Variante (für Steigerung)
+//   machine  Übung an Laufband/Ergometer (lange Dauer, nicht für Zirkel/Zufall)
 
 export const CATEGORIES = {
   beine: 'Beine & Po',
@@ -26,17 +27,23 @@ export const EQUIPMENT = {
   band: 'Widerstandsband',
   stange: 'Klimmzugstange',
   kettlebell: 'Kettlebell',
+  laufband: 'Laufband',
+  ergometer: 'Ergometer (Fahrrad)',
 };
 
 const DEFAULTS = {
   needs: [], level: 1, mode: 'reps', range: [8, 12], perSide: false,
-  jump: false, wrist: 'ok', easier: null, harder: null, steps: [], tips: [],
+  jump: false, wrist: 'ok', easier: null, harder: null, machine: false, steps: [], tips: [],
 };
 
 const RAW = [
   // ---------- Beine & Po ----------
+  { id: 'aufstehen-stuhl', name: 'Aufstehen vom Stuhl', cat: 'beine', muscles: 'Oberschenkel, Po',
+    needs: ['stuhl'], range: [10, 15], harder: 'kniebeuge',
+    steps: ['Setz dich vorn auf die Kante eines stabilen Stuhls, die Füße stehen hüftbreit flach am Boden.', 'Lehn den geraden Oberkörper leicht nach vorn und verschränk die Arme vor der Brust.', 'Steh über die Fersen auf, ohne dich mit den Händen abzustützen.', 'Setz dich langsam und kontrolliert wieder hin, nicht einfach fallen lassen.'],
+    tips: ['Die Knie zeigen in Richtung der Fußspitzen.', 'Beim Aufstehen ausatmen, beim Hinsetzen einatmen.', 'Schwerer: die Sitzfläche nur kurz antippen statt dich richtig hinzusetzen.'] },
   { id: 'kniebeuge', name: 'Kniebeuge', cat: 'beine', muscles: 'Oberschenkel, Po',
-    range: [10, 15], harder: 'goblet-squat',
+    range: [10, 15], easier: 'aufstehen-stuhl', harder: 'goblet-squat',
     steps: ['Stell dich hüftbreit hin, die Füße zeigen leicht nach außen.', 'Schieb den Po nach hinten unten, als würdest du dich auf einen Stuhl setzen.', 'Geh so tief, wie du den Rücken gerade halten kannst.', 'Drück dich über die Fersen wieder nach oben.'],
     tips: ['Die Knie zeigen in Richtung der Fußspitzen und fallen nicht nach innen.', 'Beim Runtergehen einatmen, beim Hochdrücken ausatmen.', 'Leichter: nur bis zu einem Stuhl runtergehen und kurz antippen.'] },
   { id: 'goblet-squat', name: 'Kniebeuge mit Hantel (Goblet Squat)', cat: 'beine', muscles: 'Oberschenkel, Po, Rumpf',
@@ -91,6 +98,30 @@ const RAW = [
     needs: ['stuhl'], level: 2, perSide: true,
     steps: ['Stell einen stabilen Stuhl mit der Lehne an die Wand und stell dich vor die Sitzfläche.', 'Setz einen Fuß komplett auf die Sitzfläche.', 'Drück dich über diese Ferse nach oben und stell den anderen Fuß dazu.', 'Steig langsam und kontrolliert wieder ab. Nach allen Wiederholungen die Seite wechseln.'],
     tips: ['Der Stuhl darf nicht kippeln oder rutschen. Nimm keinen Stuhl mit Rollen.', 'Die Kraft kommt aus dem oberen Bein. Stoß dich nicht mit dem unteren Fuß ab.', 'Leichter: eine Treppenstufe nehmen. Schwerer: in jeder Hand eine Hantel halten.'] },
+  { id: 'muschel', name: 'Muschel (Clamshell)', cat: 'beine', muscles: 'seitlicher Po, Hüfte',
+    needs: ['matte'], perSide: true, range: [12, 20],
+    steps: ['Leg dich auf die Seite, der Kopf liegt auf dem unteren Arm. Die Knie sind angewinkelt, die Füße liegen aufeinander.', 'Die obere Hand liegt locker vor dem Bauch, das Becken steht senkrecht.', 'Öffne das obere Knie wie eine Muschel, die Füße bleiben dabei zusammen.', 'Schließ das Knie langsam wieder. Nach allen Wiederholungen die Seite wechseln.'],
+    tips: ['Das Becken kippt nicht nach hinten, die Bewegung kommt nur aus der Hüfte.', 'Oben kurz halten und die seitliche Pomuskulatur spüren.', 'Schwerer: das Knie langsam in 3 Sekunden schließen.'] },
+  { id: 'beinheben-seitlich', name: 'Seitliches Beinheben im Liegen', cat: 'beine', muscles: 'seitlicher Po, Hüfte',
+    needs: ['matte'], perSide: true, range: [12, 20],
+    steps: ['Leg dich auf die Seite, der Kopf liegt auf dem unteren Arm, die Beine sind gestreckt.', 'Das untere Knie darf leicht gebeugt sein, damit du stabil liegst.', 'Heb das obere Bein gestreckt bis etwa Hüfthöhe, die Fußspitze zeigt nach vorn.', 'Senk es langsam wieder ab. Nach allen Wiederholungen die Seite wechseln.'],
+    tips: ['Nicht nach hinten kippen, der Körper bleibt in einer Linie.', 'Die Bewegung ist klein und kontrolliert, nicht schwingen.', 'Schwerer: oben jeweils 2 Sekunden halten.'] },
+  { id: 'beinheben-stehend', name: 'Seitliches Beinheben im Stehen', cat: 'beine', muscles: 'seitlicher Po, Gleichgewicht',
+    perSide: true, range: [12, 20],
+    steps: ['Stell dich aufrecht neben eine Stuhllehne und umgreif sie locker mit einer Hand.', 'Spann den Bauch an, das Standbein ist leicht gebeugt.', 'Heb das äußere Bein gestreckt zur Seite, ohne den Oberkörper zu neigen.', 'Senk es langsam wieder ab. Nach allen Wiederholungen die Seite wechseln.'],
+    tips: ['Der Oberkörper bleibt gerade, nicht zur Seite lehnen.', 'Die Fußspitze zeigt nach vorn, nicht nach oben.', 'Schwerer: ohne Festhalten, das trainiert zusätzlich das Gleichgewicht.'] },
+  { id: 'esels-kick', name: 'Beinheben im Vierfüßlerstand', cat: 'beine', muscles: 'Po, Beinrückseite',
+    needs: ['matte'], perSide: true, range: [12, 15],
+    steps: ['Geh in den Vierfüßlerstand auf den Unterarmen: Ellbogen unter den Schultern, Knie unter der Hüfte.', 'Die Hände bilden lockere Fäuste, das Gewicht liegt auf den Unterarmen.', 'Heb ein Bein mit gebeugtem Knie nach oben, bis der Oberschenkel waagerecht ist. Die Fußsohle zeigt zur Decke.', 'Senk das Knie langsam, ohne es abzulegen. Nach allen Wiederholungen die Seite wechseln.'],
+    tips: ['Kein Hohlkreuz: Bauch anspannen und das Bein nur so hoch heben, wie der Rücken ruhig bleibt.', 'Oben den Po kurz fest anspannen.', 'Leg ein gefaltetes Handtuch unter die Knie, wenn es drückt.'] },
+  { id: 'good-morning', name: 'Good Morning mit Hantel', cat: 'beine', muscles: 'Beinrückseite, Po, unterer Rücken',
+    needs: ['hanteln'], level: 2, range: [10, 15],
+    steps: ['Stell dich hüftbreit hin und halte eine Hantel mit beiden Händen am Griff dicht vor der Brust.', 'Beuge die Knie leicht und halte den Rücken gerade.', 'Schieb den Po nach hinten und kipp den Oberkörper nach vorn, bis du die Beinrückseite spürst.', 'Richte dich über die Hüfte wieder auf und spann oben den Po an.'],
+    tips: ['Der Rücken bleibt die ganze Zeit gerade, kein Rundrücken.', 'Nur so weit nach vorn, wie der Rücken gerade bleibt.', 'Schwerer ohne mehr Gewicht: 3 Sekunden nach vorn und unten 1 Sekunde halten.'] },
+  { id: 'kreuzheben-koffer', name: 'Koffer-Kreuzheben', cat: 'beine', muscles: 'Beine, Po, seitlicher Rumpf',
+    needs: ['hanteln'], level: 2, perSide: true,
+    steps: ['Stell dich hüftbreit hin, eine Hantel steht neben deinem rechten Fuß.', 'Geh mit geradem Rücken in die Knie, als würdest du dich hinsetzen, und greif die Hantel.', 'Steh aufrecht auf, ohne dich zur Seite zu neigen, und stell die Hantel kontrolliert wieder ab.', 'Nach allen Wiederholungen Hand und Seite wechseln.'],
+    tips: ['Die Schultern bleiben gerade, der Rumpf arbeitet gegen das Kippen.', 'Das Handgelenk bleibt gerade, die Hantel hängt locker am langen Arm.', 'Beim Aufstehen ausatmen.'] },
 
   // ---------- Brust, Schultern & Trizeps ----------
   { id: 'liegestuetz-wand', name: 'Liegestütze an der Wand', cat: 'push', muscles: 'Brust, Schultern, Trizeps',
@@ -195,6 +226,14 @@ const RAW = [
     needs: ['stange'], level: 3, range: [3, 8], easier: 'klimmzug-negativ',
     steps: ['Greif die Stange von oben, etwas breiter als schulterbreit, und häng dich mit gestreckten Armen daran.', 'Zieh die Schultern nach unten und spann den Bauch an.', 'Zieh dich nach oben, bis dein Kinn über der Stange ist.', 'Lass dich langsam und kontrolliert wieder ab, bis die Arme gestreckt sind.'],
     tips: ['Kein Schwung mit den Beinen. Lieber weniger Wiederholungen, dafür sauber.', 'Beim Hochziehen ausatmen, beim Ablassen einatmen.', 'Noch zu schwer? Erst Negative Klimmzüge üben oder mit den Füßen auf einem Stuhl etwas helfen.'] },
+  { id: 'wand-engel', name: 'Wand-Engel', cat: 'pull', muscles: 'oberer Rücken, Schultern, Haltung',
+    range: [8, 12],
+    steps: ['Stell dich mit dem Rücken an eine Wand, die Füße eine Fußlänge davor. Po, Rücken und Hinterkopf berühren die Wand.', 'Heb die Arme zu einem U: Oberarme auf Schulterhöhe, Unterarme zeigen nach oben, die Handrücken an der Wand.', 'Schieb die Arme langsam an der Wand nach oben, so weit es geht, ohne den Kontakt zu verlieren.', 'Zieh sie wieder zurück in die U-Position und die Schulterblätter dabei nach unten.'],
+    tips: ['Kein Hohlkreuz: der untere Rücken bleibt nah an der Wand.', 'Nur so weit bewegen, wie Arme und Rücken die Wand berühren. Das wird mit der Zeit mehr.', 'Die Handgelenke bleiben locker und gerade.'] },
+  { id: 'pullover', name: 'Hantel-Pullover am Boden', cat: 'pull', muscles: 'Rücken, Brust',
+    needs: ['hanteln', 'matte'], level: 2, range: [10, 15],
+    steps: ['Leg dich mit angewinkelten Beinen auf den Rücken und halte eine Hantel mit beiden Händen am Griff über der Brust.', 'Die Arme sind fast gestreckt, die Ellbogen leicht gebeugt.', 'Führ die Hantel in einem Bogen langsam hinter den Kopf Richtung Boden, so weit es angenehm ist.', 'Zieh sie im gleichen Bogen zurück über die Brust.'],
+    tips: ['Der untere Rücken bleibt am Boden, den Bauch leicht anspannen.', 'Die Hantel fest umgreifen, die Handgelenke bleiben gerade.', 'Langsam bewegen: 3 Sekunden nach hinten, 2 Sekunden zurück.'] },
 
   // ---------- Bauch & Rumpf ----------
   { id: 'unterarmstuetz-knie', name: 'Unterarmstütz auf Knien', cat: 'rumpf', muscles: 'Bauch, Rumpf',
@@ -295,6 +334,32 @@ const RAW = [
     needs: ['kettlebell'], level: 2, range: [12, 20],
     steps: ['Stell dich etwas breiter als hüftbreit hin, die Kettlebell steht etwa 30 cm vor dir am Boden.', 'Schieb den Po nach hinten, greif den Griff mit beiden Händen und zieh sie zwischen die Beine.', 'Schieb die Hüfte kräftig nach vorn, sodass die Kettlebell bis etwa auf Brusthöhe schwingt.', 'Lass sie zurückschwingen und geh direkt in die nächste Wiederholung.'],
     tips: ['Die Kraft kommt aus Po und Hüfte, die Arme heben nicht aktiv mit.', 'Rücken und Handgelenke bleiben gerade, der Rücken wird nicht rund.', 'Beim Nach-vorn-Schwingen kräftig ausatmen. Sorg für genug Platz um dich herum.'] },
+  { id: 'ausfallschritt-druecken', name: 'Ausfallschritt mit Drücken', cat: 'cardio', muscles: 'Beine, Po, Schultern',
+    needs: ['hanteln'], level: 3, perSide: true, range: [6, 10],
+    steps: ['Stell dich aufrecht hin und halte die Hanteln auf Schulterhöhe, die Handflächen zeigen zueinander.', 'Mach einen großen Schritt nach hinten und senk das hintere Knie Richtung Boden.', 'Drück dich zurück in den Stand und drück dabei beide Hanteln nach oben über den Kopf.', 'Senk die Hanteln wieder auf die Schultern. Nach allen Wiederholungen das Bein wechseln.'],
+    tips: ['Beim Drücken den Bauch anspannen und kein Hohlkreuz machen.', 'Die Handgelenke bleiben gerade, die Hanteln liegen über den Unterarmen.', 'Leichter: Ausfallschritt und Drücken getrennt nacheinander machen.'] },
+
+  // ---------- Kondition an Geräten ----------
+  { id: 'laufband-gehen', name: 'Zügiges Gehen (Laufband)', cat: 'cardio', muscles: 'Beine, Herz-Kreislauf',
+    needs: ['laufband'], mode: 'time', range: [300, 900], machine: true,
+    steps: ['Stell dich auf die Seitenleisten, starte das Band langsam und steig dann auf.', 'Geh aufrecht in der Mitte des Bandes, der Blick geht nach vorn.', 'Steigere das Tempo, bis du zügig gehst und etwas schneller atmest (meist 4–6 km/h).', 'Zum Schluss das Tempo langsam verringern und erst bei Stillstand absteigen.'],
+    tips: ['Nicht an den Griffen festhalten, die Arme schwingen locker mit.', 'Befestige die Not-Aus-Leine an deiner Kleidung, falls dein Laufband eine hat.', 'Du solltest dich dabei noch gut unterhalten können.'] },
+  { id: 'laufband-joggen', name: 'Lockeres Joggen (Laufband)', cat: 'cardio', muscles: 'Beine, Herz-Kreislauf',
+    needs: ['laufband'], level: 2, mode: 'time', range: [60, 1200], machine: true,
+    steps: ['Erhöhe das Tempo aus dem zügigen Gehen langsam, bis du locker joggst (meist 6–8 km/h).', 'Lauf aufrecht mit kurzen, leichten Schritten, die Füße landen unter dem Körper.', 'Die Arme sind angewinkelt und schwingen locker mit.', 'Zum Wechsel ins Gehen das Tempo stufenweise zurücknehmen.'],
+    tips: ['Lieber zu langsam als zu schnell: Du solltest noch in kurzen Sätzen sprechen können.', 'Nicht auf das Band schauen, der Blick geht geradeaus.', 'Bei Seitenstechen ins Gehen wechseln und ruhig ausatmen.'] },
+  { id: 'laufband-steigung', name: 'Gehen mit Steigung (Laufband)', cat: 'cardio', muscles: 'Po, Beine, Herz-Kreislauf',
+    needs: ['laufband'], mode: 'time', range: [300, 1200], machine: true,
+    steps: ['Geh zügig und stell dann eine Steigung ein, für den Anfang etwa 4–8 %.', 'Verringere das Tempo, falls nötig, bis die Anstrengung passt.', 'Geh aufrecht mit vollen Schritten und roll über die ganze Fußsohle ab.', 'Vor dem Ende die Steigung wieder auf null stellen und locker ausgehen.'],
+    tips: ['Nicht an den Griffen festhalten, sonst geht die Wirkung verloren.', 'Leicht nach vorn lehnen ist in Ordnung, aber kein Rundrücken.', 'Sehr gelenkschonend und trotzdem wirksam für Po und Beine.'] },
+  { id: 'ergo-locker', name: 'Locker treten (Ergometer)', cat: 'cardio', muscles: 'Beine, Herz-Kreislauf',
+    needs: ['ergometer'], mode: 'time', range: [300, 1200], machine: true,
+    steps: ['Stell den Sattel so ein, dass das Bein unten fast gestreckt ist.', 'Setz dich aufrecht hin, die Hände liegen locker am Lenker.', 'Tritt gleichmäßig mit geringem Widerstand, etwa 70–90 Umdrehungen pro Minute.', 'Atme ruhig, du solltest dich problemlos unterhalten können.'],
+    tips: ['Den Lenker nur locker halten, nicht aufstützen. Die Handgelenke bleiben gerade.', 'Die Knie zeigen nach vorn und kippen nicht nach innen.', 'Ist der Sattel zu hoch, wackelt die Hüfte; ist er zu tief, werden die Knie belastet.'] },
+  { id: 'ergo-kraeftig', name: 'Kräftig treten (Ergometer)', cat: 'cardio', muscles: 'Beine, Herz-Kreislauf',
+    needs: ['ergometer'], level: 2, mode: 'time', range: [60, 600], machine: true,
+    steps: ['Erhöhe den Widerstand um ein paar Stufen.', 'Tritt gleichmäßig weiter, die Trittfrequenz bleibt möglichst bei 70–90 pro Minute.', 'Du atmest deutlich schneller und kannst nur noch in kurzen Sätzen sprechen.', 'Zum Erholen den Widerstand wieder zurückdrehen.'],
+    tips: ['Der Oberkörper bleibt ruhig und schaukelt nicht hin und her.', 'Lieber etwas mehr Widerstand als hektisches Treten.', 'Nicht auf dem Lenker abstützen, die Handgelenke bleiben entlastet.'] },
 
   // ---------- Beweglichkeit ----------
   { id: 'armkreisen', name: 'Armkreisen', cat: 'mobil', muscles: 'Schultern',
@@ -345,6 +410,10 @@ const RAW = [
     needs: ['matte'], mode: 'time', range: [30, 45], wrist: 'flat',
     steps: ['Geh in den Vierfüßlerstand: Hände unter den Schultern, Knie unter der Hüfte.', 'Katze: Mach beim Ausatmen den Rücken rund und zieh das Kinn zur Brust.', 'Kuh: Lass beim Einatmen den Bauch sinken und heb Brust und Blick leicht an.', 'Wechsle ruhig und fließend zwischen beiden Positionen, bis die Zeit um ist.'],
     tips: ['Langsam im Rhythmus deines Atems bewegen, ohne zu ruckeln.', 'Nur so weit bewegen, wie es angenehm ist.', 'Mit Handgelenkproblemen lieber auf Fäusten oder auf den Unterarmen stützen.'] },
+  { id: 'offenes-buch', name: 'Offenes Buch', cat: 'mobil', muscles: 'Brustwirbelsäule, Brust, Schultern',
+    needs: ['matte'], mode: 'time', range: [30, 45], perSide: true,
+    steps: ['Leg dich auf die Seite, die Knie sind angewinkelt und liegen aufeinander. Die Arme liegen gestreckt vor dir.', 'Heb den oberen Arm und dreh ihn in einem Bogen zur anderen Seite, wie eine Buchseite, die sich öffnet.', 'Der Blick folgt der Hand, die Knie bleiben zusammen am Boden.', 'Halte kurz, dreh langsam zurück und wiederhole. Zur Halbzeit die Seite wechseln.'],
+    tips: ['Ruhig ausatmen, während du dich öffnest.', 'Nur so weit drehen, wie es angenehm zieht.', 'Ein Kissen unter dem Kopf macht es bequemer.'] },
 ];
 
 export const EXERCISES = RAW.map((e) => ({

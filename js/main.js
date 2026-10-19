@@ -1,6 +1,7 @@
 // Einstieg: Router, Navigation, Design, Offline-Unterstützung.
 import { getState, requestPersistence } from './store.js';
 import { hydrateIcons } from './ui.js';
+import { initNav, navigate, switchTab, rerender, closeAllSheets } from './nav.js';
 import { renderHome } from './views/home.js';
 import { renderPlans, renderPlanDetail } from './views/plans.js';
 import { renderPlanEditor } from './views/editor.js';
@@ -31,14 +32,15 @@ let current = null;
 function route() {
   const hash = location.hash || '#/heute';
   if (!getState().onboarded && hash !== '#/willkommen') {
-    location.replace('#/willkommen');
+    navigate('#/willkommen', { replace: true });
     return;
   }
   const r = ROUTES.find((x) => x.re.test(hash));
   if (!r) {
-    location.replace('#/heute');
+    navigate('#/heute', { replace: true });
     return;
   }
+  closeAllSheets();
   current?.destroy?.();
   current = null;
   const app = document.getElementById('app');
@@ -56,17 +58,25 @@ function route() {
   if (!r.immersive) window.scrollTo(0, 0);
 }
 
+// Tabs wie in einer App: zwischen Tabs wird ersetzt, „Zurück“ führt zu „Heute“.
+document.getElementById('tabbar').addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-tab]');
+  if (!a) return;
+  e.preventDefault();
+  switchTab(a.getAttribute('href'));
+});
+
 // Installations-Hinweis von Chrome merken, damit die Startseite einen Knopf zeigen kann.
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   window.__installPrompt = e;
-  if ((location.hash || '#/heute') === '#/heute') route();
+  if ((location.hash || '#/heute') === '#/heute') rerender();
 });
 window.addEventListener('appinstalled', () => { window.__installPrompt = null; });
 
-window.addEventListener('hashchange', route);
 applyTheme();
 hydrateIcons();
+initNav(route);
 route();
 requestPersistence();
 
