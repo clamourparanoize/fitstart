@@ -5,6 +5,7 @@ import { h, icon, toast, fmtMinutes, fmtNum, plural } from '../ui.js';
 import { upgradeExercise } from '../session.js';
 import { thisWeekCount, entryReps } from '../stats.js';
 import { signal } from '../feedback.js';
+import { navigate, backOrReplace } from '../nav.js';
 import { exBadge } from './common.js';
 
 let result = null;
@@ -14,10 +15,10 @@ export function setResult(r) {
 
 export function renderSummary() {
   if (!result) {
-    location.replace('#/heute');
+    navigate('#/heute', { replace: true });
     return null;
   }
-  const { entry, newBadges, levelBefore, levelAfter, suggestions } = result;
+  const { entry, newBadges, levelBefore, levelAfter, suggestions, stageUp } = result;
   const state = getState();
   const goal = state.settings.weeklyGoal;
   const week = thisWeekCount(state.history);
@@ -39,8 +40,14 @@ export function renderSummary() {
       h('div', { class: 'stat' }, h('div', { class: 'label' }, 'Dauer'), h('div', { class: 'value' }, fmtMinutes(entry.durationSec))),
       entry.kind === 'kraft'
         ? h('div', { class: 'stat' }, h('div', { class: 'label' }, 'Wiederholungen'), h('div', { class: 'value num' }, fmtNum(reps), h('small', null, `in ${sets} Sätzen`)))
-        : h('div', { class: 'stat' }, h('div', { class: 'label' }, 'Intervalle'), h('div', { class: 'value num' }, sets, h('small', null, plural(entry.exercises.length, 'Übung', 'Übungen')))),
+        : entry.kind === 'ausdauer'
+          ? h('div', { class: 'stat' }, h('div', { class: 'label' }, entry.km ? 'Strecke' : 'Stufe'),
+            h('div', { class: 'value num' }, entry.km ? String(entry.km).replace('.', ',') : (entry.stage ?? 0) + 1, h('small', null, entry.km ? 'km' : 'von 4')))
+          : h('div', { class: 'stat' }, h('div', { class: 'label' }, 'Intervalle'), h('div', { class: 'value num' }, sets, h('small', null, plural(entry.exercises.length, 'Übung', 'Übungen')))),
     ),
+    entry.kcal ? h('p', { class: 'muted' }, `🔥 ${fmtNum(entry.kcal)} kcal laut Gerät`) : null,
+    stageUp ? h('div', { class: 'hint-box', style: { textAlign: 'left' } }, '📶',
+      h('div', null, h('b', null, `Stufe ${stageUp.stage} freigeschaltet! `), `Nächstes Mal bei „${stageUp.name}“: ${stageUp.text}.`)) : null,
 
     h('div', { class: 'card', style: { textAlign: 'left' } },
       h('div', { class: 'row' }, h('h3', { class: 'grow' }, 'Punkte'), h('span', { class: 'tag accent' }, `+${entry.xp} XP`)),
@@ -82,7 +89,7 @@ export function renderSummary() {
       suggestions.map((sg) => suggestionRow(sg)),
     ) : null,
 
-    h('a', { class: 'btn primary big block', href: '#/heute', onclick: () => { result = null; } }, icon('check'), 'Fertig'),
+    h('button', { class: 'btn primary big block', onclick: () => { result = null; backOrReplace('#/heute'); } }, icon('check'), 'Fertig'),
   );
   return el;
 }

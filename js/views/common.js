@@ -5,6 +5,7 @@ import { h, icon, confirmDialog } from '../ui.js';
 import { startSession } from '../session.js';
 import { unlockAudio } from '../feedback.js';
 import { planMeta } from '../plans.js';
+import { navBack } from '../nav.js';
 
 export const CAT_EMOJI = { beine: '🦵', push: '💪', pull: '🚣', rumpf: '🎯', cardio: '⚡', mobil: '🧘' };
 
@@ -57,7 +58,7 @@ export function planCard(plan, { badge } = {}) {
 
 export function topbar(title, { back, sub, actions } = {}) {
   return h('div', { class: 'topbar' },
-    back ? h('a', { class: 'icon-btn', href: back, 'aria-label': 'Zurück' }, icon('left')) : null,
+    back ? h('button', { class: 'icon-btn', 'aria-label': 'Zurück', onclick: () => navBack(back) }, icon('left')) : null,
     h('div', { style: { flex: 1, minWidth: 0 } }, h('h1', null, title), sub ? h('div', { class: 'sub' }, sub) : null),
     actions || null,
   );

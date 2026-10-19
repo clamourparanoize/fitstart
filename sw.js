@@ -1,6 +1,6 @@
 // Service Worker: hält die App offline verfügbar.
 // Bei jeder neuen Version VERSION erhöhen, damit Handys die neuen Dateien laden.
-const VERSION = 'fitstart-v1';
+const VERSION = 'fitstart-v2';
 const FILES = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const FILES = [
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
   './js/main.js',
+  './js/nav.js',
   './js/ui.js',
   './js/store.js',
   './js/feedback.js',
@@ -29,10 +30,14 @@ const FILES = [
   './js/views/settings.js',
   './js/views/player.js',
   './js/views/summary.js',
+  './js/views/log.js',
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: 'reload' umgeht den HTTP-Cache, damit wirklich die neuen Dateien geladen werden
+  event.waitUntil(caches.open(VERSION)
+    .then((cache) => cache.addAll(FILES.map((f) => new Request(f, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

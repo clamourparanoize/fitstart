@@ -16,16 +16,33 @@ Alle Daten bleiben auf dem Handy.
 - **Extra-Trainings:** Bauch & Rumpf (10 Min.), Beweglichkeit, Morgen-Wachmacher, Kurz & knackig, Arme & Schultern.
 - **Überrasch mich:** ein zufällig zusammengestelltes Training mit 10, 20 oder 30 Minuten.
 - **Eigene Pläne** anlegen, bearbeiten und kopieren.
-- **75 Übungen** mit Schritt-für-Schritt-Anleitung, Tipps und Vorlesefunktion.
-  Sie sind gefiltert nach der Ausrüstung (5-kg-Hanteln, Matte, Stuhl usw.) und nach Rücksichten:
+- **91 Übungen** mit Schritt-für-Schritt-Anleitung, Tipps und Vorlesefunktion.
+  Sie sind gefiltert nach der Ausrüstung (5-kg-Hanteln, Matte, Stuhl, Laufband, Ergometer usw.) und nach Rücksichten:
   - Handgelenke schonen: Liegestütze nur auf den Fäusten, Stütz nur auf den Unterarmen.
   - Optional „keine Sprünge“.
+- **Erst erklären, dann loslegen:** Bei neuen Übungen zeigt die App die Anleitung groß an und liest sie vor.
+  Der Countdown startet erst nach „Bereit“. Ab dem 3. Mal kommt eine kurze Ansage mit automatischem Start,
+  ab dem 6. Mal nur noch der Name. In den Einstellungen lässt sich „immer ausführlich“ wählen.
+- **Freihändig trainieren:**
+  - Automatik: Jeder Satz läuft im Takt (einstellbar, Standard 3 Sek. pro Wiederholung) und wird mitgezählt.
+    Danach startet die Pause von selbst. Am Ende lassen sich die Zahlen kurz korrigieren.
+  - Ein Tipp irgendwo auf den Bildschirm heißt „Bereit“ bzw. „Satz fertig“.
 - **Krafttraining Satz für Satz:**
   - Ziel aus dem letzten Mal (+1 Wiederholung), Pausentimer und Halte-Timer.
   - Vorschlag für die schwerere Variante, sobald alle Ziele erreicht sind.
 - **Zeittraining:** Übung und Pause im Takt, mit Ton, Vibration, Sprachansage und Hinweis zum Seitenwechsel.
-- **Aufwärmen und Dehnen** automatisch dabei; beides lässt sich abschalten.
-- **Motivation:** Punkte & Level, 29 Abzeichen, Wochenziel mit Serie, Tages-Challenge, Konfetti.
+- **Ausdauer an Geräten:**
+  - Vier geführte Programme mit je 4 Stufen: Laufband Gehen & Joggen, Laufband bergauf, Ergometer Intervalle, Ergometer gleichmäßig.
+  - Die Belastung wird als „Anstrengung x von 10“ angesagt, weil jedes Gerät anders ist.
+  - Nach zwei geschafften Einheiten geht es automatisch eine Stufe weiter.
+  - Am Ende lassen sich km und kcal vom Display eintragen.
+  - Freie Einheiten (auch Spaziergang, Radfahren, Schwimmen) lassen sich nachträglich eintragen.
+- **Aufwärmen und Dehnen** automatisch dabei, das Aufwärmen wahlweise auf Laufband oder Ergometer. Beides lässt sich abschalten.
+- **Zurück-Taste wie in einer App:** Sie schließt erst offene Fenster und geht dann eine Ebene zurück, von Tabs zu „Heute“.
+  Im Training fragt sie, ob du unterbrechen willst.
+- **Fitness-Stufe** (Einsteiger, etwas Erfahrung, fortgeschritten): Davon hängen Startziele, Varianten, Intervalle und die Ausdauer-Stufe ab.
+- **Datensicherung:** alle Daten als Datei sichern (z. B. in Google Drive) und wieder einspielen.
+- **Motivation:** Punkte & Level, 35 Abzeichen, Wochenziel mit Serie, Tages-Challenge, Konfetti.
 - **Fortschritt:**
   - Trainings pro Woche und Kalender.
   - Volumen: Minuten, Wiederholungen, kg.
@@ -51,6 +68,12 @@ node tools/server.mjs --lan
 Danach die angezeigte `http://192.168…:5173`-Adresse am Handy öffnen.
 Windows fragt beim ersten Mal eventuell nach einer Firewall-Freigabe.
 
+## Mehrere Personen
+
+Jede Person installiert die App auf dem eigenen Handy über denselben Link.
+Beim ersten Start wählt jede Person ihre eigene Fitness-Stufe, Ausrüstung, Rücksichten und ihr Wochenziel.
+Die Daten bleiben automatisch getrennt, weil sie nur auf dem jeweiligen Handy gespeichert werden.
+
 ## Am PC testen
 
 ```bash
@@ -75,6 +98,7 @@ Neue Dateien müssen außerdem in der Liste `FILES` in `sw.js` stehen.
 | `js/gamification.js` | Punkte, Level, Abzeichen, Challenges, Sprüche |
 | `js/stats.js` | Auswertungen (Wochen, Serie, Bestleistungen) |
 | `js/charts.js` | Diagramme (SVG) |
+| `js/nav.js` | Navigation und Zurück-Taste (Verlauf, Fenster, Tabs, Training) |
 | `js/views/*` | Bildschirme der App |
 | `tools/make-icons.mjs` | erzeugt die App-Icons neu |
 

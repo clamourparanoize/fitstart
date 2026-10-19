@@ -86,13 +86,16 @@ export function barChart({ data, format = (v) => String(v), goal = null, goalLab
     }
   });
 
-  if (goal) {
-    svg.append(s('line', { class: 'goal-line', x1: m.l, x2: W - m.r, y1: y(goal), y2: y(goal) }));
-    svg.append(s('text', { class: 'goal-label', x: W - m.r, y: y(goal) - 5, 'text-anchor': 'end' }, `${goalLabel} ${format(goal)}`));
-  }
-
   // Wert der letzten Säule direkt beschriften
   const last = data[data.length - 1];
+  if (goal) {
+    svg.append(s('line', { class: 'goal-line', x1: m.l, x2: W - m.r, y1: y(goal), y2: y(goal) }));
+    // Ziel-Beschriftung nach links, wenn sie sonst mit dem Wert der letzten Säule kollidiert
+    const clash = last && last.value > 0 && Math.abs(y(last.value) - y(goal)) < 16;
+    svg.append(s('text', {
+      class: 'goal-label', x: clash ? m.l + 4 : W - m.r, y: y(goal) - 5, 'text-anchor': clash ? 'start' : 'end',
+    }, `${goalLabel} ${format(goal)}`));
+  }
   if (last && last.value > 0) {
     svg.append(s('text', { class: 'direct-label', x: bars.at(-1).x + bw / 2, y: y(last.value) - 6, 'text-anchor': 'middle' }, format(last.value)));
   }

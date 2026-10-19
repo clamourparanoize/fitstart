@@ -299,6 +299,9 @@ svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-widt
   animation: slide-up 0.24s cubic-bezier(.2,.8,.2,1);
 }
 .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--surface-3); margin: 0 auto 14px; }
+.sheet-head { position: sticky; top: -10px; z-index: 2; margin: -10px -18px 4px; padding: 10px 18px 0; background: var(--surface); }
+.sheet-head .grab { margin-bottom: 6px; }
+.sheet-close { position: absolute; right: 8px; top: 4px; color: var(--text-2); }
 .sheet h2 { margin-bottom: 4px; }
 .backdrop.center { align-items: center; padding: 16px; }
 .backdrop.center .sheet { border-radius: 24px; max-width: 420px; }
@@ -331,6 +334,7 @@ svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-widt
 .player-body > :first-child { margin-top: auto; }
 .player-body > :last-child { margin-bottom: auto; }
 .player-foot { display: flex; flex-direction: column; gap: 10px; }
+.player-foot .row .btn.small { min-width: 0; padding: 0 10px; font-size: 14px; }
 
 .ex-title { font-size: 30px; font-weight: 800; line-height: 1.12; letter-spacing: -0.015em; }
 .ex-sub { color: var(--text-2); font-weight: 600; }
@@ -365,8 +369,33 @@ details.howto li + li { margin-top: 6px; }
 .ring-time { font-size: clamp(56px, 19vw, 88px); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; line-height: 1; }
 .ring-label { font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); margin-top: 6px; }
 
+/* Erklärung vor der Übung */
+.intro { display: flex; flex-direction: column; gap: 10px; }
+.intro .phase-label { color: var(--accent-ink); }
+.intro-info {
+  align-self: flex-start; background: var(--accent-soft); color: var(--text); font-weight: 650;
+  padding: 6px 12px; border-radius: 10px; font-size: 14.5px;
+}
+.intro-steps { margin: 4px 0 0; padding-left: 24px; font-size: 17.5px; line-height: 1.5; }
+.intro-steps li + li { margin-top: 8px; }
+.intro-tips { margin: 0; padding-left: 22px; color: var(--text-2); font-size: 15px; }
+p.intro-tips { padding-left: 0; }
+.intro-tips li + li { margin-top: 4px; }
+.auto-bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-top: 6px; }
+.auto-bar > div { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; }
+.tap-hint { text-align: center; font-size: 13px; color: var(--muted); margin: 2px 0 0; }
+.auto-status { font-size: 18px; font-weight: 700; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.effort { font-size: 14px; font-weight: 650; color: var(--text-2); }
+.review-sets { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 10px; }
+.review-set { display: flex; flex-direction: column; align-items: center; }
+.review-set .stepper .val { min-width: 44px; font-size: 20px; }
+.review-set .stepper .icon-btn { width: 38px; height: 38px; }
+.news-card { border: 2px solid var(--accent); }
+
 /* Phasenfarben im Zeittraining */
 .player.phase-work { --phase: var(--accent); }
+.player.phase-easy { --phase: var(--rest); }
+.player.phase-intro { --phase: var(--accent); }
 .player.phase-rest, .player.phase-roundrest { --phase: var(--rest); }
 .player.phase-prep, .player.phase-warmup { --phase: var(--prep); }
 .player.phase-cooldown { --phase: var(--cool); }

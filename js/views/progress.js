@@ -4,9 +4,10 @@ import { getState, update } from '../store.js';
 import { h, icon, openSheet, confirmDialog, toast, segmented, fmtDate, fmtDateLong, fmtTime, fmtMinutes, fmtNum, plural } from '../ui.js';
 import { weeklySeries, streakInfo, totals, exerciseSeries, trainedExerciseIds, calendarGrid } from '../stats.js';
 import { barChart, lineChart, calendarHeat } from '../charts.js';
+import { rerender } from '../nav.js';
 import { exBadge, topbar } from './common.js';
 
-const view = { volume: 'minutes', exId: null, exMetric: 'best', historyLimit: 15 };
+const view = { volume: 'minutes', cardio: null, exId: null, exMetric: 'best', historyLimit: 15 };
 const shortDate = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'numeric' });
 const sd = (ts) => shortDate.format(new Date(ts));
 
@@ -32,7 +33,7 @@ export function renderProgress() {
     tot.minutes >= 120
       ? stat('Trainingszeit', String(Math.round(tot.minutes / 6) / 10).replace('.', ','), 'Stunden')
       : stat('Trainingszeit', Math.round(tot.minutes), 'Minuten'),
-    stat('Wochen-Serie', st.current, st.best > st.current ? `Rekord ${st.best}` : 'Wochen'),
+    stat('Wochen-Serie', st.current, st.best > st.current ? `Rekord ${st.best}` : st.current === 1 ? 'Woche' : 'Wochen'),
     stat('Bestleistungen', prs, 'verbessert'),
   ));
 
@@ -66,6 +67,35 @@ export function renderProgress() {
     segmented(Object.entries(VOL).map(([k, v]) => [k, v.label]), view.volume, (k) => { view.volume = k; paintVol(); }),
     h('div', { style: { marginTop: '12px' } }, volBox),
   ));
+
+  // Ausdauer (Laufband, Ergometer, draußen)
+  if (tot.cardio) {
+    const cBox = h('div');
+    const CARDIO = {
+      km: { label: 'km', get: (w) => Math.round(w.km * 10) / 10, fmt: (v) => String(Math.round(v * 10) / 10).replace('.', ','), head: 'Kilometer' },
+      cardioMin: { label: 'Minuten', get: (w) => Math.round(w.cardioMin), fmt: (v) => fmtNum(v), head: 'Minuten' },
+      kcal: { label: 'kcal', get: (w) => Math.round(w.kcal), fmt: (v) => fmtNum(v), head: 'Kalorien' },
+    };
+    if (!CARDIO[view.cardio]) view.cardio = tot.km ? 'km' : 'cardioMin';
+    const paintCardio = () => {
+      const m = CARDIO[view.cardio];
+      cBox.innerHTML = '';
+      cBox.append(barChart({
+        data: weeks.map((w) => ({ label: sd(w.start), tipTitle: `Woche ab ${sd(w.start)}`, value: m.get(w) })),
+        format: m.fmt, tableHeaders: ['Woche', m.head],
+      }));
+    };
+    paintCardio();
+    el.append(card('Ausdauer pro Woche', 'Laufband, Ergometer und eingetragene Einheiten. km und kcal kommen von deinen Eingaben.',
+      h('div', { class: 'stat-grid', style: { marginBottom: '12px' } },
+        stat('Einheiten', fmtNum(tot.cardio)),
+        stat('Strecke', String(Math.round(tot.km * 10) / 10).replace('.', ','), 'km'),
+      ),
+      segmented(Object.entries(CARDIO).map(([k, v]) => [k, v.label]), view.cardio, (k) => { view.cardio = k; paintCardio(); }),
+      h('div', { style: { marginTop: '12px' } }, cBox),
+      tot.kcal ? h('p', { class: 'small muted', style: { marginTop: '8px' } }, `Insgesamt ${fmtNum(tot.kcal)} kcal laut Geräteanzeige.`) : null,
+    ));
+  }
 
   // Kraft pro Übung
   const ids = trainedExerciseIds(hist);
@@ -110,14 +140,14 @@ export function renderProgress() {
       h('div', { class: 'ex-badge' }, entry.emoji || '💪'),
       h('div', { class: 'grow' },
         h('div', { class: 'title' }, entry.name),
-        h('div', { class: 'meta' }, `${fmtDate(entry.start)} · ${fmtMinutes(entry.durationSec)} · +${entry.xp} XP${entry.prs?.length ? ' · 🏆' : ''}`),
+        h('div', { class: 'meta' }, `${fmtDate(entry.start)} · ${fmtMinutes(entry.durationSec)}${entry.km ? ` · ${kmText(entry.km)}` : ''} · +${entry.xp} XP${entry.prs?.length ? ' · 🏆' : ''}`),
       ),
       icon('right', 'chev'),
     ));
   });
   el.append(listEl);
   if (hist.length > view.historyLimit) {
-    el.append(h('button', { class: 'btn block', onclick: () => { view.historyLimit += 30; window.dispatchEvent(new HashChangeEvent('hashchange')); } }, 'Mehr anzeigen'));
+    el.append(h('button', { class: 'btn block', onclick: () => { view.historyLimit += 30; rerender(); } }, 'Mehr anzeigen'));
   }
   return el;
 }
@@ -142,8 +172,12 @@ function card(title, sub, ...children) {
   );
 }
 
+const kmText = (km) => `${String(Math.round(km * 100) / 100).replace('.', ',')} km`;
+
 function setsText(ex, sets) {
-  if (ex.mode === 'time' || sets.every((x) => x.reps == null)) return sets.map((x) => `${x.sec}s`).join(' · ');
+  if (ex.mode === 'time' || sets.every((x) => x.reps == null)) {
+    return sets.map((x) => (x.sec >= 120 ? `${Math.round(x.sec / 60)} Min.` : `${x.sec}s`)).join(' · ');
+  }
   const kg = sets.find((x) => x.kg)?.kg;
   return `${sets.map((x) => x.reps).join(' · ')} Wdh.${kg ? ` · ${String(kg).replace('.', ',')} kg` : ''}`;
 }
@@ -153,6 +187,11 @@ function openEntry(entry) {
     h('div', null,
       h('h2', null, `${entry.emoji || '💪'} ${entry.name}`),
       h('div', { class: 'muted small' }, `${fmtDateLong(entry.start)}, ${fmtTime(entry.start)} Uhr · ${fmtMinutes(entry.durationSec)} · +${entry.xp} XP`),
+      entry.km || entry.kcal ? h('div', { class: 'row wrap', style: { gap: '6px', marginTop: '8px' } },
+        entry.km ? h('span', { class: 'tag' }, `🛣️ ${kmText(entry.km)}`) : null,
+        entry.kcal ? h('span', { class: 'tag' }, `🔥 ${fmtNum(entry.kcal)} kcal`) : null,
+        entry.stage != null ? h('span', { class: 'tag' }, `Stufe ${entry.stage + 1}`) : null,
+      ) : null,
     ),
     entry.exercises.length
       ? h('div', { class: 'list' }, entry.exercises.map((e) => {
@@ -167,11 +206,11 @@ function openEntry(entry) {
     h('button', {
       class: 'btn danger block',
       onclick: async () => {
-        close();
+        await close();
         if (await confirmDialog({ title: 'Eintrag löschen?', text: 'Das Training wird aus dem Verlauf entfernt, die Punkte dafür ebenfalls. Abzeichen bleiben.', ok: 'Löschen', danger: true })) {
           update((s) => { s.history = s.history.filter((x) => x.id !== entry.id); });
           toast('Eintrag gelöscht');
-          window.dispatchEvent(new HashChangeEvent('hashchange'));
+          rerender();
         }
       },
     }, icon('trash'), 'Eintrag löschen'),

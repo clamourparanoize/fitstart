@@ -122,10 +122,10 @@ export function openExerciseSheet(exId, opts = {}) {
     bestText ? h('div', { class: 'tag rest', style: { padding: '8px 12px', whiteSpace: 'normal' } }, '🏆 ', bestText) : null,
     h('div', { class: 'row wrap' },
       speechAvailable() ? h('button', { class: 'btn small', onclick: () => say(`${ex.name}. ${ex.steps.join(' ')} Tipp: ${ex.tips[0]}`, { force: true }) }, icon('speaker'), 'Vorlesen') : null,
-      ex.easier ? h('button', { class: 'btn small', onclick: () => { close(); openExerciseSheet(ex.easier, opts); } }, icon('down'), 'Leichter') : null,
-      ex.harder ? h('button', { class: 'btn small', onclick: () => { close(); openExerciseSheet(ex.harder, opts); } }, icon('up'), 'Schwerer') : null,
+      ex.easier ? h('button', { class: 'btn small', onclick: async () => { await close(); openExerciseSheet(ex.easier, opts); } }, icon('down'), 'Leichter') : null,
+      ex.harder ? h('button', { class: 'btn small', onclick: async () => { await close(); openExerciseSheet(ex.harder, opts); } }, icon('up'), 'Schwerer') : null,
     ),
-    opts.variants ? variantSection(exId, swappedFrom, () => { close(); opts.onChange?.(); }) : null,
+    opts.variants ? variantSection(exId, swappedFrom, async () => { await close(); opts.onChange?.(); }) : null,
   );
   const { close } = openSheet(content, { onClose: stopSpeech });
   return close;

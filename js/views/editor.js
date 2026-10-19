@@ -3,6 +3,7 @@ import { EX, EXERCISES, CATEGORIES } from '../exercises.js';
 import { getState, update } from '../store.js';
 import { h, icon, openSheet, toast, segmented, stepper, toggleRow, uid, levelDots } from '../ui.js';
 import { isAllowed } from '../plans.js';
+import { navigate, backOrReplace } from '../nav.js';
 import { CAT_EMOJI, exBadge, topbar } from './common.js';
 
 const EMOJIS = ['⭐', '💪', '🔥', '⚡', '🎯', '🧘', '🦵', '🏃', '🌞', '🚀'];
@@ -14,7 +15,7 @@ export function renderPlanEditor(id) {
   if (draftFor !== id || !draft) {
     const existing = id ? state.plans.find((p) => p.id === id) : null;
     if (id && !existing) {
-      location.replace('#/plaene');
+      navigate('#/plaene', { replace: true });
       return null;
     }
     draft = existing
@@ -100,7 +101,7 @@ export function renderPlanEditor(id) {
     draft = null;
     draftFor = undefined;
     toast('Plan gespeichert');
-    location.hash = `#/plan/${plan.id}`;
+    backOrReplace(`#/plan/${plan.id}`);
     return null;
   };
 
